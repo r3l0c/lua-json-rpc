@@ -8,6 +8,7 @@
 -- Requirements: 
 --------------------------------------------------
 local jsonrpc = require("json-rpc")
+local logging = require("logging")
 
 -- We don't care about logging here
 jsonrpc.logger:setLevel(logging.FATAL)
