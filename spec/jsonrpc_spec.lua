@@ -199,12 +199,17 @@ describe("Test server_response", function()
     return true, {"hello", 5}
   end
 
+  local function multiple_ret_values(params)
+    return true, "first", "second", "third"
+  end
+
   local methods = {
     subtract = subtract,
     sum = sum,
     notify_sum = notify_sum,
     notify_hello = notify_hello,
-    get_data = get_data
+    get_data = get_data,
+    multiple_ret_values = multiple_ret_values,
   }
   
   it("Test server parse error", function()
@@ -312,6 +317,14 @@ describe("Test server_response", function()
     local ret = jsonrpc.server_response(methods, jsonstr)
     assert.are.equal(1, ret.id)
     assert.are.equal(19, ret.result)
+  end)
+
+  it("Test server procedure with multiple ret values", function()
+    local jsonstr = jsonrpc.encode_rpc(jsonrpc.request, "multiple_ret_values")
+    local ret = jsonrpc.server_response(methods, jsonstr)
+    assert.are.equal("first", ret.result[1])
+    assert.are.equal("second", ret.result[2])
+    assert.are.equal("third", ret.result[3])
   end)
 
   it("Test server batch requests empty array", function()

@@ -183,14 +183,23 @@ local function handle_request(methods, req)
 
   local params = req['params'] or {}
 
-  local ret
-  ret = {pcall(fnc, params)}
+  -- According to the Lua reference, if the first return value of `pcall` is
+  -- true (success), then all the following return values are those of the
+  -- invoked function.
+  -- According to our (??) specs, any remote procedure must also return a
+  -- success flag, and then the actual return values (or error data).
+  -- Therefore:
+  --   `ret[1]` tells whether `pcall` was successful
+  --   `ret[2]` tells whether the executed function was successful
+
+  local ret = {pcall(fnc, params)}
 
   if ret[1] == false then
     return response_error(req, 'invalid_params', ret[2])
   end
 
   if ret[2] == false then
+    -- the method was invoked correctly, but itself returned non-success
     local error_name = ret[3]
     if nil == error_name then
       return response_error(req, 'invalid_params', ret[4])
@@ -204,7 +213,18 @@ local function handle_request(methods, req)
     return true 
   end
 
-  return response(req, ret[3])
+
+  local results = nil
+  if #ret==3 then
+    -- the method had a single, actual return value
+    results = ret[3]
+  else
+    results = {}
+    for i = 3,#ret do
+      results[i-2] = ret[i]
+    end
+  end
+  return response(req, results)
 end
 
 local function server_response(methods, request)
