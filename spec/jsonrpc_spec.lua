@@ -160,6 +160,12 @@ end)
 
 describe("Test server_response", function()
   local function subtract(params)
+    if type(params) ~= 'table' then
+        return false, nil, "Parameters must be passed in a table"
+    end
+    if next(params) == nil then -- check for empty table
+      return false, nil, "Must provide some arguments"
+    end
     local minutend
     local subtrahend
     

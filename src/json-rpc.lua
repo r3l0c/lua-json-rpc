@@ -181,7 +181,11 @@ local function handle_request(methods, req)
     return response_error(req, 'method_not_found')
   end
 
-  local params = req['params'] or {}
+  local params = req['params']
+  -- the JSON lib we are using uses a special value to encode the JSON null...
+  if (params==json.util.null) or (params==nil) then
+    params = {}
+  end
 
   -- According to the Lua reference, if the first return value of `pcall` is
   -- true (success), then all the following return values are those of the
@@ -195,7 +199,8 @@ local function handle_request(methods, req)
   local ret = {pcall(fnc, params)}
 
   if ret[1] == false then
-    return response_error(req, 'invalid_params', ret[2])
+    logger:error("In pcall(): " .. ret[2])
+    return response_error(req, 'internal_error', ret[2])
   end
 
   if ret[2] == false then
