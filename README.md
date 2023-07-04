@@ -2,6 +2,9 @@
 
 ### A Lua 5.3 library for generating and processing JSON-RPC
 
+####
+[Original repo][4].
+
 ## Setup
 
 To setup and use the library and its dependencies `luarocks` is used. To install
@@ -121,3 +124,4 @@ $ busted
 [1]: https://github.com/luarocks/luarocks/wiki/Download
 [2]: ./spec/jsonrpc_spec.lua
 [3]: https://olivinelabs.com/busted/
+[4]: https://gitlab.kuleuven.be/u0129795/lua-json-rpc/-/tree/master/
