@@ -13,30 +13,30 @@ local json = require('json')
 -- Logging
 local logging = require('logging')
 local logger = logging.new(function(self, level, message)
-                             print(level, message)
-                             return true
-                           end)
+  print(level, message)
+  return true
+end)
 
-local id_gen = {free_id = 0}
+local id_gen = { free_id = 0 }
 
 -- Standard error objects which can be extended with user defined error objects
 -- having error codes from -32000 to -32099. Helper functions add_error_object
 -- and get_error_object can be used to add and retrieve error objects.
 local error_objects = {
-  parse_error       = { err_code=-32700, err_message="Parse error"},
-  invalid_request   = { err_code=-32600, err_message="Invalid request"},
-  method_not_found  = { err_code=-32601, err_message="Method not found"},
-  invalid_params    = { err_code=-32602, err_message="Invalid params"},
-  internal_error    = { err_code=-32603, err_message="Internal error"},
-  server_error      = { err_code=-32000, err_message="Server error"},
+  parse_error      = { err_code = -32700, err_message = "Parse error" },
+  invalid_request  = { err_code = -32600, err_message = "Invalid request" },
+  method_not_found = { err_code = -32601, err_message = "Method not found" },
+  invalid_params   = { err_code = -32602, err_message = "Invalid params" },
+  internal_error   = { err_code = -32603, err_message = "Internal error" },
+  server_error     = { err_code = -32000, err_message = "Server error" },
 }
 
 local function is_std_error(error_name)
   return ((error_name == 'parse_error') or
-          (error_name == 'invalid_request') or
-          (error_name == 'method_not_found') or
-          (error_name == 'internal_error') or
-          (error_name == 'server_error'))
+    (error_name == 'invalid_request') or
+    (error_name == 'method_not_found') or
+    (error_name == 'internal_error') or
+    (error_name == 'server_error'))
 end
 
 -- Get an error object based on its' name.
@@ -46,7 +46,7 @@ local function get_error_object(error_name)
   return error_objects[error_name]
 end
 
--- Add an error object. If and error code outside of the standard allowed is 
+-- Add an error object. If and error code outside of the standard allowed is
 -- given a new object is not created.
 -- If an object with the same name exists it is overwritten.
 -- If an object with the same error code exists a new object is not created.
@@ -75,8 +75,8 @@ local function add_error_object(error_name, error_object)
 
   -- If an object with than name already exists, overwrite it.
   if error_objects[error_name] then
-    logger:warn("Error object with name "..error_name.." already exists."..
-                "Overwritting...")
+    logger:warn("Error object with name " .. error_name .. " already exists." ..
+      "Overwritting...")
     error_objects[error_name] = error_object
     return error_objects[error_name]
   end
@@ -84,8 +84,8 @@ local function add_error_object(error_name, error_object)
   -- If an object with the specified error code exists fail and return nil.
   for k, v in pairs(error_objects) do
     if v.err_code == error_object.err_code then
-      logger:error("Error code "..tostring(error_object.err_code)..
-                   " is already assigned to "..k)
+      logger:error("Error code " .. tostring(error_object.err_code) ..
+        " is already assigned to " .. k)
       return nil
     end
   end
@@ -149,7 +149,7 @@ end
 local function response_error(req, error_name, data)
   local res = {}
   local error_object = get_error_object(error_name) or
-                       get_error_object('internal_error')
+      get_error_object('internal_error')
   res['error'] = {
     code = error_object.err_code,
     message = error_object.err_message,
@@ -183,7 +183,7 @@ local function handle_request(methods, req)
 
   local params = req['params']
   -- the JSON lib we are using uses a special value to encode the JSON null...
-  if (params==json.util.null) or (params==nil) then
+  if (params == json.util.null) or (params == nil) then
     params = {}
   end
 
@@ -196,7 +196,7 @@ local function handle_request(methods, req)
   --   `ret[1]` tells whether `pcall` was successful
   --   `ret[2]` tells whether the executed function was successful
 
-  local ret = {pcall(fnc, params)}
+  local ret = { pcall(fnc, params) }
 
   if ret[1] == false then
     logger:error("In pcall(): " .. ret[2])
@@ -214,19 +214,19 @@ local function handle_request(methods, req)
   end
 
   -- Notification only
-  if not req['id']  then
-    return true 
+  if not req['id'] then
+    return true
   end
 
 
   local results = nil
-  if #ret==3 then
+  if #ret == 3 then
     -- the method had a single, actual return value
     results = ret[3]
   else
     results = {}
-    for i = 3,#ret do
-      results[i-2] = ret[i]
+    for i = 3, #ret do
+      results[i - 2] = ret[i]
     end
   end
   return response(req, results)
@@ -246,7 +246,7 @@ local function server_response(methods, request)
   elseif #req == 0 then
     return response_error(req, 'invalid_request', req)
   else
-    res = {}
+    local res = {}
     for i, r in pairs(req) do
       local lres = handle_request(methods, r)
       if type(lres) == 'table' then
