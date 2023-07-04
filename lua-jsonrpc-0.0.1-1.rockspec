@@ -1,7 +1,7 @@
 package = "lua-jsonrpc"
 version = "0.0.1-1"
 source = {
-   url = "*** please add URL for source tarball, zip or repository here ***"
+   url = "https://github.com/r3l0c/lua-json-rpc.git"
 }
 description = {
    summary = "A Lua>=5.2 library for generating and processing JSON-RPC",
